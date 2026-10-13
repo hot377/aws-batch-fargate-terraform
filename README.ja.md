@@ -157,9 +157,9 @@ terraform destroy
 
 ## ライセンス
 
-このリポジトリの Terraform コード、GitHub Actions のワークフロー、ドキュメント、構成図は [MIT License](LICENSE) で公開しています。
+このリポジトリの Terraform コード、GitHub Actions のワークフロー (`ecr_push.yaml` を除く)、ドキュメント、構成図は [MIT License](LICENSE) で公開しています。
 
-アプリケーションコード (`aggregate_accesslog.py`、`Dockerfile`、`modules/lambda/src/function.py`) は下記の Qiita 記事で公開されているコードに基づくもので、このリポジトリの MIT License の対象外です。利用条件は元の記事を参照してください。
+アプリケーションコード (`aggregate_accesslog.py`、`Dockerfile`、`modules/lambda/src/function.py`) とワークフロー `.github/workflows/ecr_push.yaml` は下記の Qiita 記事で公開されているコードに基づくもので、このリポジトリの MIT License の対象外です。利用条件は元の記事を参照してください。
 
 ## 参考
 

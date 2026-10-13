@@ -157,9 +157,9 @@ Deletion fails if objects remain in the source or result bucket, or if images re
 
 ## License
 
-The Terraform code, GitHub Actions workflows, documentation, and architecture diagram in this repository are licensed under the [MIT License](LICENSE).
+The Terraform code, GitHub Actions workflows (except `ecr_push.yaml`), documentation, and architecture diagram in this repository are licensed under the [MIT License](LICENSE).
 
-The application code (`aggregate_accesslog.py`, `Dockerfile`, and `modules/lambda/src/function.py`) is based on the code published in the Qiita article listed below and is not covered by the MIT License of this repository. Refer to the original article for its terms.
+The application code (`aggregate_accesslog.py`, `Dockerfile`, and `modules/lambda/src/function.py`) and the workflow `.github/workflows/ecr_push.yaml` are based on the code published in the Qiita article listed below and are not covered by the MIT License of this repository. Refer to the original article for their terms.
 
 ## Reference
 
