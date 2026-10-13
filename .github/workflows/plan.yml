@@ -1,0 +1,95 @@
+name: TerraformPlan
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  TF_VERSION: 1.14.6
+  AWS_DEFAULT_REGION: ap-northeast-1
+  AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+  # Terraform変数（バケット名）はシークレットから渡す
+  TF_VAR_source_bucket_name: ${{ secrets.SOURCE_BUCKET_NAME }}
+  TF_VAR_result_bucket_name: ${{ secrets.RESULT_BUCKET_NAME }}
+  TF_VAR_tfstate_bucket_name: ${{ secrets.TFSTATE_BUCKET_NAME }}
+
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+  pull-requests: write
+
+jobs:
+  Terraform_plan_and_Comment:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./
+
+    steps:
+      # リポジトリのチェックアウトをする。
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      # OICDでAssumeRoleをする。
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+
+      - name: Setup Terraform
+        # バージョン2を使用する。
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Exec Terraform fmt check
+        id: fmt
+        run: terraform fmt -check -recursive
+        # exit code 3でエラーになり終了してしまうため
+        # continue-on-error: true で後続の処理も続ける。
+        continue-on-error: true
+
+      - name: Exec Terraform init
+        id: init
+        run: terraform init
+
+      - name: Validate
+        run: terraform validate
+
+      - name: Exec Terraform plan
+        id: plan
+        run: terraform plan -no-color
+
+      # terraform plan の結果をコメント欄に出力する。
+      - name : comment
+        uses: actions/github-script@v6
+        env:
+          # ここのstdoutでterraform planの結果をPLANに保存している。
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+
+        with:
+          script: |
+
+            const output = `### terraform cicd
+            #### Terraform Format and Style \`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization \`${{ steps.init.outcome }}\`
+            #### Terraform Plan \`${{ steps.plan.outcome }}\`
+            #### Terraform Validation \`${{ steps.validate.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`${process.env.PLAN}\`\`\`
+
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })

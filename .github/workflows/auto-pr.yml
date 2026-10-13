@@ -1,0 +1,34 @@
+name: Auto PR on Push
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Get commit message
+        id: commit
+        run: echo "msg=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        run: |
+          gh pr create \
+            --base main \
+            --head ${{ github.ref_name }} \
+            --title "${{ steps.commit.outputs.msg }}" \
+            --body-file .github/pull_request_template.md \
+            --label "automated-pr" || echo "PR already exists."
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}

@@ -1,0 +1,12 @@
+# terraform.tfvars にコピーして、自分の環境の値に書き換える
+# S3バケット名は全世界で一意である必要がある
+source_bucket_name  = "<YOUR_SOURCE_BUCKET_NAME>"
+result_bucket_name  = "<YOUR_RESULT_BUCKET_NAME>"
+tfstate_bucket_name = "<YOUR_TFSTATE_BUCKET_NAME>"
+
+# 以下は任意。リソース名とタグに使われる値で、省略時は既定値が使われる
+# ecr_repo_name を変える場合は .github/workflows/ecr_push.yaml の ECR_REPOSITORY も合わせる
+# environment   = "dev"
+# vpc_name      = "fargate-batch-vpc"
+# ecr_repo_name = "fargate-batch-repo"
+# github_repo   = "<OWNER>/<REPOSITORY>"
